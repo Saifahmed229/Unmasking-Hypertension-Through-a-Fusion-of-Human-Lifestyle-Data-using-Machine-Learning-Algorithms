@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Login - HyperPredict{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <lottie-player src="https://assets.lottiefiles.com/packages/lf20_m3ixlkyk.json" background="transparent" speed="1" style="width: 300px; height: 300px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; opacity: 0.25;" loop autoplay></lottie-player>
+    <div class="hero-content">
+        <h1>Login to HyperPredict</h1>
+        <p class="lead mt-3">Access your heart health insights with your account.</p>
+    </div>
+</section>
+
+<div class="container-main">
+    <div class="section-card reveal">
+        <h2><i class="fas fa-sign-in-alt"></i> User Login</h2>
+
+        {% if messages %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'UserLoginCheck' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="loginid" class="form-label">Login ID <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                    <input type="text" class="form-control" id="loginid" name="loginid" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+            </div>
+            <div class="mb-3 text-center">
+                <button type="submit" class="btn" style="background: var(--monitor-color); color: var(--text-light);">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </button>
+            </div>
+        </form>
+        <div class="text-center mt-3">
+            <p>Don't have an account? <a href="{% url 'UserRegisterForm' %}" class="text-decoration-underline">Register here</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        border-color: var(--monitor-color);
+        box-shadow: 0 0 10px var(--monitor-color);
+        transform: scale(1.02);
+        transition: all 0.3s ease;
+    }
+
+    .input-group-text {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 2px solid linear-gradient(45deg, var(--monitor-color), var(--secondary-color));
+        color: var(--monitor-color);
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    .alert-info {
+        background: rgba(59, 130, 246, 0.1);
+        border: 2px solid var(--primary-color);
+        color: var(--text-dark);
+    }
+
+    .btn:hover {
+        background: var(--secondary-color) !important;
+        transform: translateY(-4px);
+        box-shadow: 0 0 15px var(--monitor-color);
+    }
+</style>
+
+<script>
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', () => {
+            gsap.to(input, { scale: 1.02, duration: 0.3, ease: 'power2.out' });
+        });
+        input.addEventListener('blur', () => {
+            gsap.to(input, { scale: 1, duration: 0.3, ease: 'power2.out' });
+        });
+    });
+</script>
+{% endblock %}

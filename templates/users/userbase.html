@@ -1,0 +1,457 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hypertension Prediction</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Poppins:wght@300;400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <!-- Internal CSS -->
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #2c0b4e; /* Royal Purple */
+            --secondary-color: #b8860b; /* Gold */
+            --accent-color: #dc2626; /* Crimson */
+            --text-dark: #1c2526;
+            --text-light: #f8e1b0; /* Light Gold */
+            --shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            --glow: 0 0 25px rgba(184, 134, 11, 0.7);
+            --glass-bg: rgba(44, 11, 78, 0.3);
+            --glass-border: 1px solid linear-gradient(45deg, rgba(255, 215, 0, 0.3), rgba(184, 134, 11, 0.5));
+            --spacing-unit: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a0b2e, #3b1a5a);
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            scroll-behavior: smooth;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            box-shadow: var(--shadow);
+            padding: calc(var(--spacing-unit) * 2) 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .navbar.scrolled {
+            background: rgba(44, 11, 78, 0.95);
+            backdrop-filter: blur(12px);
+        }
+
+        .navbar-brand {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2.3rem;
+            color: var(--text-light) !important;
+            text-shadow: 0 0 15px var(--secondary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-light) !important;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-left: calc(var(--spacing-unit) * 2);
+            padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar-nav .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--accent-color);
+            opacity: 0.3;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .navbar-nav .nav-link:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--secondary-color) !important;
+            box-shadow: var(--glow);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center/cover,
+                        linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-light);
+            padding: calc(var(--spacing-unit) * 10) calc(var(--spacing-unit) * 2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: gradientShift 25s ease-in-out infinite;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(184, 134, 11, 0.3), rgba(44, 11, 78, 0.7));
+            z-index: 1;
+            animation: pulse 15s infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero-section h1, .hero-section p, .hero-section #datetime {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-section h1 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            background: linear-gradient(45deg, var(--secondary-color), var(--text-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInDown 1.5s ease-out;
+        }
+
+        .hero-section p {
+            font-size: 1.6rem;
+            margin: calc(var(--spacing-unit) * 3) 0;
+            opacity: 0.9;
+            animation: fadeInUp 1.7s ease-out;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-section #datetime {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            animation: fadeInUp 1.9s ease-out;
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            padding: calc(var(--spacing-unit) * 6);
+            border-radius: 20px;
+            margin: calc(var(--spacing-unit) * 6) auto;
+            box-shadow: var(--shadow);
+            max-width: 1100px;
+            border: 2px solid linear-gradient(45deg, var(--secondary-color), var(--text-light));
+            transition: all 0.4s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .section-card h2 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2.8rem;
+            color: var(--secondary-color);
+            margin-bottom: calc(var(--spacing-unit) * 3);
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit));
+            text-shadow: 0 0 15px var(--secondary-color);
+        }
+
+        .section-card h2 i {
+            font-size: 2.2rem;
+            color: var(--text-light);
+        }
+
+        .section-card p, .section-card ul li {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        .section-card ul li {
+            position: relative;
+            padding-left: calc(var(--spacing-unit) * 4);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            transition: transform 0.3s ease;
+        }
+
+        .section-card ul li:hover {
+            transform: translateX(calc(var(--spacing-unit)));
+        }
+
+        .section-card ul li::before {
+            content: '\f004';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--secondary-color);
+            position: absolute;
+            left: 0;
+            top: 6px;
+            font-size: 1.3rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(45deg, var(--primary-color), var(--text-dark));
+            color: var(--text-light);
+            padding: calc(var(--spacing-unit) * 4) 0;
+            border-top: 3px solid var(--secondary-color);
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 1.1rem;
+            font-family: 'Montserrat', sans-serif;
+            opacity: 0.9;
+        }
+
+        /* Floating Icon */
+        @keyframes floatIcon {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0.3; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0.3; }
+        }
+
+        .floating-icon {
+            position: absolute;
+            color: rgba(184, 134, 11, 0.3);
+            font-size: 40px;
+            animation: floatIcon 12s infinite linear;
+            z-index: 0;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scroll Reveal Effect */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero-section h1 {
+                font-size: 3rem;
+            }
+
+            .section-card {
+                padding: calc(var(--spacing-unit) * 4);
+                margin: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 2);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: calc(var(--spacing-unit) * 6) calc(var(--spacing-unit));
+            }
+
+            .hero-section h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-section p {
+                font-size: 1.3rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.8rem;
+            }
+
+            .section-card h2 {
+                font-size: 2.2rem;
+            }
+
+            .floating-icon {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="fas fa-heartbeat me-2"></i>HyperPredict</a>
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon text-dark"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto d-flex gap-3">
+                    <a class="nav-link" href="{% url 'index' %}">Home</a>
+                    <a class="nav-link" href="{% url 'viewdataset' %}">Dataset</a>
+                    <a class="nav-link" href="{% url 'training' %}">Training</a>
+                    <a class="nav-link" href="{% url 'prediction' %}">Projection</a>
+                    <a class="nav-link" href="{% url 'base' %}">Log Out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1>Hypertension Projection Using Machine Learning</h1>
+        <p class="lead mt-3">Leveraging AI for Early Detection and Management of High Blood Pressure</p>
+        <div id="datetime" class="mt-3 fs-6"></div>
+    </section>
+
+    <!-- About -->
+    <div class="section-card reveal" id="about">
+        <h2><i class="fas fa-info-circle"></i> About HyperPredict</h2>
+        <p>
+            HyperPredict is an innovative platform that utilizes Machine Learning algorithms to predict the risk of hypertension.
+            By analyzing various health parameters, we aim to provide early warnings and assist in effective management of high blood pressure,
+            thereby reducing the risk of cardiovascular diseases.
+        </p>
+    </div>
+
+    <!-- How It Works -->
+    <div class="section-card reveal">
+        <h2><i class="fas fa-cogs"></i> How It Works</h2>
+        <ul>
+            <li><strong>Data Collection:</strong> Gathers comprehensive health data including age, BMI, lifestyle habits, and medical history.</li>
+            <li><strong>Machine Learning Model:</strong> Applies advanced machine learning algorithms to predict the risk of hypertension based on the collected data.</li>
+            <li><strong>Risk Evaluation:</strong> Provides a personalized risk evaluation and suggests lifestyle improvements or medical intervention if necessary.</li>
+        </ul>
+    </div>
+    {% block content %}
+    {% endblock %}
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p>© 2025 HyperPredict | All Rights Reserved</p>
+            <p>Developed by MSL Corporations</p>
+        </div>
+    </footer>
+
+    <!-- Floating Icons -->
+    <div class="floating-icon" style="left: 20%; bottom: 10%;">
+        <i class="fas fa-heartbeat"></i>
+    </div>
+    <div class="floating-icon" style="left: 80%; bottom: 30%;">
+        <i class="fas fa-heartbeat"></i>
+    </div>
+
+    <!-- Bootstrap 5 and Font Awesome JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+
+    <!-- GSAP and Scripts -->
+    <script>
+        // DateTime Update
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            };
+            document.getElementById('datetime').textContent = now.toLocaleString('en-US', options);
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Scroll Reveal
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach((element) => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('active');
+                    gsap.to(element, { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' });
+                }
+            });
+        }
+
+        window.addEventListener('scroll', reveal);
+        reveal();
+
+        // Navbar Scroll Effect SCHOOL
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+    </script>
+</body>
+
+</html>

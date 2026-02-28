@@ -1,0 +1,168 @@
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Registration - HyperPredict{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <lottie-player src="https://assets.lottiefiles.com/packages/lf20_m3ixlkyk.json" background="transparent" speed="1" style="width: 300px; height: 300px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; opacity: 0.25;" loop autoplay></lottie-player>
+    <div class="hero-content">
+        <h1>Register for HyperPredict</h1>
+        <p class="lead mt-3">Create an account to monitor and manage your heart health with AI-driven insights.</p>
+    </div>
+</section>
+
+<div class="container-main">
+    <div class="section-card reveal">
+        <h2><i class="fas fa-user-plus"></i> Register Here</h2>
+        {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Please correct the following errors:
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <form method="post" action="{% url 'UserRegisterForm' %}" id="registerForm">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    <input type="text" class="form-control" id="name" name="name" pattern="[a-zA-Z]+" title="Name must contain only letters" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="loginid" class="form-label">Login ID <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                    <input type="text" class="form-control" id="loginid" name="loginid" pattern="[a-zA-Z]+" title="Login ID must contain only letters" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Password must contain at least one number, one uppercase, one lowercase letter, and at least 8 characters" required>
+                </div>
+                <div id="passwordFeedback" class="form-text text-muted"></div>
+            </div>
+            <div class="mb-3">
+                <label for="mobile" class="form-label">Mobile <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                    <input type="text" class="form-control" id="mobile" name="mobile" pattern="[56789][0-9]{9}" title="Mobile must start with 5, 6, 7, 8, or 9 and be 10 digits long" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="locality" class="form-label">Locality <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                    <input type="text" class="form-control" id="locality" name="locality" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-home"></i></span>
+                    <textarea class="form-control" id="address" name="address" rows="4" maxlength="250" required></textarea>
+                </div>
+            </div>
+            <input type="hidden" name="status" value="waiting">
+            <div class="mb-3 text-center">
+                <button type="submit" class="btn" style="background: var(--monitor-color); color: var(--text-light);"><i class="fas fa-user-plus me-2"></i>Register</button>
+            </div>
+        </form>
+        <div class="text-center mt-3">
+            <p>Already registered? <a href="{% url 'UserLogin' %}" class="text-decoration-underline">Login here</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Form Input Animations */
+    .form-control:focus {
+        border-color: var(--monitor-color);
+        box-shadow: 0 0 10px var(--monitor-color);
+        transform: scale(1.02);
+        transition: all 0.3s ease;
+    }
+
+    .input-group-text {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 2px solid linear-gradient(45deg, var(--monitor-color), var(--secondary-color));
+        color: var(--monitor-color);
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.1);
+        border: 2px solid var(--warning-color);
+        color: var(--text-dark);
+    }
+
+    .btn:hover {
+        background: var(--secondary-color) !important;
+        transform: translateY(-4px);
+        box-shadow: 0 0 15px var(--monitor-color);
+    }
+
+    /* Password Feedback */
+    #passwordFeedback.valid {
+        color: var(--monitor-color);
+    }
+
+    #passwordFeedback.invalid {
+        color: var(--warning-color);
+    }
+</style>
+
+<script>
+    // GSAP Animation for Form Inputs
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', () => {
+            gsap.to(input, { scale: 1.02, duration: 0.3, ease: 'power2.out' });
+        });
+        input.addEventListener('blur', () => {
+            gsap.to(input, { scale: 1, duration: 0.3, ease: 'power2.out' });
+        });
+    });
+
+    // Password Strength Feedback
+    const passwordInput = document.getElementById('password');
+    const passwordFeedback = document.getElementById('passwordFeedback');
+    if (passwordInput && passwordFeedback) {
+        passwordInput.addEventListener('input', () => {
+            const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
+            if (regex.test(passwordInput.value)) {
+                passwordFeedback.textContent = 'Password is strong!';
+                passwordFeedback.classList.remove('invalid');
+                passwordFeedback.classList.add('valid');
+            } else {
+                passwordFeedback.textContent = 'Password must contain at least one number, one uppercase, one lowercase letter, and at least 8 characters';
+                passwordFeedback.classList.remove('valid');
+                passwordFeedback.classList.add('invalid');
+            }
+        });
+    }
+</script>
+{% endblock %}

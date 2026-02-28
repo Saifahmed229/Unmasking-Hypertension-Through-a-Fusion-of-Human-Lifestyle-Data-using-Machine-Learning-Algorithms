@@ -1,0 +1,1082 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hypertension Prediction</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@600&family=Roboto+Slab:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+    <!-- Lottie Player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <!-- GSAP for Advanced Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <!-- Internal CSS -->
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #60a5fa;
+            --accent-color: #dc2626;
+            --monitor-color: #22c55e; /* Green for hospital monitor */
+            --warning-color: #ef4444; /* Red for high BP/HR */
+            --text-dark: #0f172a;
+            --text-light: #f8fafc;
+            --shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+            --glow: 0 0 25px rgba(96, 165, 250, 0.5);
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: 1px solid linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(96, 165, 250, 0.5));
+            --spacing-unit: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            scroll-behavior: smooth;
+        }
+
+        /* Main Container */
+        .container-main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 calc(var(--spacing-unit) * 2);
+        }
+
+        /* Background Icons */
+        .bg-icons {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-icon {
+            position: absolute;
+            color: rgba(96, 165, 250, 0.2);
+            font-size: 55px;
+            animation: float 14s infinite ease-in-out;
+        }
+
+        .bg-icon:nth-child(1) { top: 8%; left: 12%; animation-duration: 15s; }
+        .bg-icon:nth-child(2) { top: 28%; left: 82%; animation-duration: 17s; }
+        .bg-icon:nth-child(3) { top: 55%; left: 18%; animation-duration: 13s; }
+        .bg-icon:nth-child(4) { top: 78%; left: 68%; animation-duration: 16s; }
+        .bg-icon:nth-child(5) { top: 18%; left: 48%; animation-duration: 18s; }
+        .bg-icon:nth-child(6) { top: 68%; left: 38%; animation-duration: 14s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-70px) scale(1.2); }
+        }
+
+        /* Header */
+        header.navbar {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            padding: calc(var(--spacing-unit) * 2) 0;
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: background 0.3s ease;
+        }
+
+        header.navbar.scrolled {
+            background: rgba(30, 64, 175, 0.95);
+            backdrop-filter: blur(12px);
+        }
+
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.3rem;
+            color: var(--text-light) !important;
+            text-shadow: 0 0 15px var(--secondary-color);
+            transition: transform 0.3s;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 2.5);
+            border-radius: 50px;
+            margin: 0 calc(var(--spacing-unit) / 2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar-nav .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--accent-color);
+            opacity: 0.3;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .navbar-nav .nav-link:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--text-light) !important;
+            box-shadow: var(--glow);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            color: var(--text-light);
+            padding: calc(var(--spacing-unit) * 12) calc(var(--spacing-unit) * 2);
+            background: url('{% static "images/hero-bg.jpg" %}') center/cover no-repeat,
+                        linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            overflow: hidden;
+            animation: gradientShift 20s ease-in-out infinite;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.25), transparent);
+            z-index: 1;
+            animation: pulse 12s infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+        }
+
+        .hero-section h1 {
+            font-family: 'Roboto Slab', serif;
+            font-size: 5.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            animation: fadeInDown 1.3s ease-out;
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-section p {
+            font-size: 1.7rem;
+            margin: calc(var(--spacing-unit) * 2.5) 0 calc(var(--spacing-unit) * 5);
+            opacity: 0.95;
+            animation: fadeInUp 1.5s ease-out;
+        }
+
+        .hero-section .btn {
+            font-size: 1.4rem;
+            padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 6);
+            background: var(--accent-color);
+            color: var(--text-light);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--secondary-color);
+            opacity: 0.3;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .hero-section .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .hero-section .btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-6px);
+            box-shadow: var(--glow);
+        }
+
+        /* BP Wave Animation (Canvas) */
+        .bp-wave {
+            position: absolute;
+            bottom: calc(var(--spacing-unit) * 20);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 800px;
+            height: 150px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid linear-gradient(45deg, var(--monitor-color), var(--secondary-color));
+            border-radius: 15px;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Heart Rate Wave Animation (Canvas) */
+        .heart-rate-wave {
+            position: absolute;
+            bottom: calc(var(--spacing-unit) * 4);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 800px;
+            height: 150px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid linear-gradient(45deg, var(--monitor-color), var(--secondary-color));
+            border-radius: 15px;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .bp-wave canvas,
+        .heart-rate-wave canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Pulse Indicator */
+        .pulse-indicator {
+            position: absolute;
+            top: calc(var(--spacing-unit) * 2);
+            left: calc(var(--spacing-unit) * 2);
+            width: 80px;
+            height: 80px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid linear-gradient(45deg, var(--monitor-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .pulse-indicator:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--monitor-color);
+        }
+
+        .pulse-indicator .pulse {
+            width: 50px;
+            height: 50px;
+            background: var(--monitor-color);
+            border-radius: 50%;
+            animation: pulseBeat 1.5s infinite;
+        }
+
+        @keyframes pulseBeat {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+
+        /* Animation Symbol (Medical Cross) */
+        .animation-symbol {
+            position: absolute;
+            top: calc(var(--spacing-unit) * 2);
+            left: calc(var(--spacing-unit) * 12);
+            width: 60px;
+            height: 60px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid linear-gradient(45deg, var(--monitor-color), var(--secondary-color));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .animation-symbol:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--monitor-color);
+        }
+
+        .animation-symbol i {
+            font-size: 30px;
+            color: var(--monitor-color);
+            text-shadow: 0 0 10px var(--monitor-color);
+        }
+
+        @keyframes symbolPulse {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.2); }
+        }
+
+        /* Static Heart Icon */
+        .heart-icon {
+            position: absolute;
+            top: calc(var(--spacing-unit) * 2);
+            left: calc(var(--spacing-unit) * 20);
+            width: 60px;
+            height: 60px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid linear-gradient(45deg, var(--monitor-color), var(--secondary-color));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .heart-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--monitor-color);
+        }
+
+        .heart-icon i {
+            font-size: 30px;
+            color: var(--monitor-color);
+            text-shadow: 0 0 10px var(--monitor-color);
+        }
+
+        /* Live BP and Heart Rate Display */
+        .live-stats {
+            position: absolute;
+            top: calc(var(--spacing-unit) * 2);
+            right: calc(var(--spacing-unit) * 2);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid linear-gradient(45deg, var(--monitor-color), var(--secondary-color));
+            padding: calc(var(--spacing-unit) * 1.5);
+            border-radius: 15px;
+            color: var(--text-light);
+            font-size: 1.1rem;
+            z-index: 2;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .live-stats.warning {
+            border: 2px solid var(--warning-color);
+        }
+
+        .live-stats span {
+            font-weight: 700;
+            color: var(--monitor-color);
+            text-shadow: 0 0 5px rgba(34, 197, 94, 0.5);
+        }
+
+        /* Section Cards */
+        .section-card {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: calc(var(--spacing-unit) * 3);
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 2px solid linear-gradient(45deg, var(--secondary-color), var(--monitor-color));
+            padding: calc(var(--spacing-unit) * 8);
+            border-radius: 30px;
+            margin: calc(var(--spacing-unit) * 8) auto;
+            max-width: 1300px;
+            box-shadow: var(--shadow);
+            transition: all 0.4s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-card h2 {
+            font-family: 'Roboto Slab', serif;
+            font-size: 3.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            position: relative;
+            margin-bottom: calc(var(--spacing-unit) * 4);
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit));
+        }
+
+        .section-card h2 i {
+            color: var(--secondary-color);
+            font-size: 2.5rem;
+        }
+
+        .section-card h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 70px;
+            height: 6px;
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+            border-radius: 4px;
+        }
+
+        .section-card p, .section-card ul li {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            line-height: 1.9;
+        }
+
+        .section-card ul li {
+            position: relative;
+            padding-left: calc(var(--spacing-unit) * 4);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            transition: transform 0.3s ease;
+        }
+
+        .section-card ul li:hover {
+            transform: translateX(calc(var(--spacing-unit)));
+        }
+
+        .section-card ul li::before {
+            content: '\f058';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--secondary-color);
+            position: absolute;
+            left: 0;
+            top: 6px;
+        }
+
+        /* Asymmetric Grid Layout */
+        .section-card.asymmetric {
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+        }
+
+        .section-card.asymmetric .image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(45deg, var(--primary-color), var(--text-dark));
+            color: var(--text-light);
+            padding: calc(var(--spacing-unit) * 8) 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 1.15rem;
+            opacity: 0.9;
+        }
+
+        #datetime {
+            font-size: 1rem;
+            margin-top: calc(var(--spacing-unit) * 2);
+            opacity: 0.85;
+        }
+
+        /* Heartbeat Animation */
+        .heartbeat {
+            position: absolute;
+            top: calc(var(--spacing-unit) * 4);
+            right: calc(var(--spacing-unit) * 4);
+            font-size: 60px;
+            color: var(--accent-color);
+            animation: heartbeat 1.6s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scroll Reveal Effect */
+        .reveal {
+            opacity: 0;
+            transform: translateY(70px);
+            transition: all 0.9s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: calc(var(--spacing-unit) * 4);
+            right: calc(var(--spacing-unit) * 4);
+            background: var(--accent-color);
+            color: var(--text-light);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-8px);
+        }
+
+        /* Live Monitor Toggle */
+        .monitor-toggle {
+            position: fixed;
+            top: calc(var(--spacing-unit) * 3);
+            right: calc(var(--spacing-unit) * 12);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid linear-gradient(45deg, var(--monitor-color), var(--secondary-color));
+            color: var(--text-light);
+            padding: calc(var(--spacing-unit)) calc(var(--spacing-unit) * 2);
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .monitor-toggle:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .section-card.asymmetric {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .section-card.asymmetric .image {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero-section h1 {
+                font-size: 4rem;
+            }
+
+            .section-card {
+                padding: calc(var(--spacing-unit) * 5);
+                margin: calc(var(--spacing-unit) * 5) calc(var(--spacing-unit) * 2);
+            }
+
+            .bp-wave,
+            .heart-rate-wave {
+                width: 90%;
+                height: 120px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: calc(var(--spacing-unit) * 10) calc(var(--spacing-unit));
+                min-height: 85vh;
+            }
+
+            .hero-section h1 {
+                font-size: 3rem;
+            }
+
+            .hero-section p {
+                font-size: 1.4rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.9rem;
+            }
+
+            .bg-icon {
+                font-size: 45px;
+            }
+
+            .section-card h2 {
+                font-size: 2.5rem;
+            }
+
+            .pulse-indicator,
+            .animation-symbol,
+            .heart-icon,
+            .live-stats {
+                transform: scale(0.8);
+            }
+
+            .heart-icon {
+                left: calc(var(--spacing-unit) * 10);
+            }
+
+            .animation-symbol {
+                left: calc(var(--spacing-unit) * 10);
+            }
+
+            .monitor-toggle {
+                right: calc(var(--spacing-unit) * 3);
+                font-size: 0.9rem;
+            }
+
+            .bp-wave,
+            .heart-rate-wave {
+                width: 95%;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Icons -->
+    <div class="bg-icons">
+        <i class="fas fa-heartbeat bg-icon"></i>
+        <i class="fas fa-stethoscope bg-icon"></i>
+        <i class="fas fa-tachometer-alt bg-icon"></i>
+        <i class="fas fa-prescription-bottle-alt bg-icon"></i>
+        <i class="fas fa-user-md bg-icon"></i>
+        <i class="fas fa-heart-pulse bg-icon"></i>
+    </div>
+
+    <!-- Header -->
+    <header class="navbar navbar-expand-lg">
+        <div class="container-main">
+            <a class="navbar-brand" href="#"><i class="fas fa-heartbeat me-2"></i>HyperPredict</a>
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon text-dark"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto d-flex gap-3">
+                    <a class="nav-link" href="{% url 'base' %}">Home</a>
+                    <a class="nav-link" href="{% url 'UserLoginCheck' %}">User</a>
+                    <a class="nav-link" href="{% url 'AdminLoginCheck' %}">Admin</a>
+                    <a class="nav-link" href="{% url 'UserRegisterForm' %}">Register</a>
+                    <a class="nav-link" href="#about">About Us</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="bp-wave">
+                <canvas id="bpCanvas"></canvas>
+            </div>
+            <div class="heart-rate-wave">
+                <canvas id="heartRateCanvas"></canvas>
+            </div>
+            <lottie-player src="https://assets.lottiefiles.com/packages/lf20_m3ixlkyk.json" background="transparent" speed="1" style="width: 300px; height: 300px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; opacity: 0.25;" loop autoplay></lottie-player>
+            <div class="pulse-indicator">
+                <div class="pulse"></div>
+            </div>
+            <div class="animation-symbol" id="animationSymbol">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="heart-icon" id="heartIcon">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div class="live-stats">
+                BP: <span id="bp-value">120/80</span> mmHg<br>
+                HR: <span id="hr-value">72</span> BPM
+            </div>
+            <button class="monitor-toggle" onclick="toggleMonitor()">Disable Live Monitor</button>
+            <div class="hero-content">
+                <i class="fas fa-heartbeat heartbeat"></i>
+                <h1>Hypertension Risk Prediction</h1>
+                <p>Harness AI-driven insights to monitor and manage your heart health in real time.</p>
+                <a href="{% url 'UserLoginCheck' %}" class="btn">Start Prediction</a>
+            </div>
+        </section>
+
+        <!-- Dynamic Block -->
+        {% block content %}
+        {% endblock %}
+
+        <!-- About -->
+        <div class="container-main">
+            <div class="section-card asymmetric reveal" id="about">
+                <div class="content">
+                    <h2><i class="fas fa-info-circle"></i> About HyperPredict</h2>
+                    <p>
+                        HyperPredict uses advanced Machine Learning to predict hypertension risk, analyzing health metrics like age, BMI, and lifestyle to deliver early warnings and actionable insights for cardiovascular health.
+                    </p>
+                </div>
+                <div class="image">
+                    <img src="{% static 'images/about-img.jpg' %}" alt="Health Monitoring">
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="container-main">
+            <div class="section-card reveal">
+                <h2><i class="fas fa-cogs"></i> How It Works</h2>
+                <ul>
+                    <li><strong>Data Collection:</strong> Gathers health data including age, BMI, lifestyle, and medical history.</li>
+                    <li><strong>Feature Selection:</strong> Employs SelectKBest to pinpoint key hypertension predictors.</li>
+                    <li><strong>Model Training:</strong> Utilizes Random Forest and Logistic Regression for robust predictions.</li>
+                    <li><strong>Risk Prediction:</strong> Provides personalized risk scores to guide health decisions.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="container-main">
+            <div class="section-card asymmetric reveal">
+                <div class="image">
+                    <img src="{% static 'images/features-img.jpg' %}" alt="Health Features">
+                </div>
+                <div class="content">
+                    <h2><i class="fas fa-rocket"></i> Features</h2>
+                    <ul>
+                        <li>Personalized hypertension risk assessment.</li>
+                        <li>Intuitive interface for data input and visualization.</li>
+                        <li>Secure authentication and data privacy.</li>
+                        <li>Comprehensive resources for prevention and management.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container-main">
+            <p>© 2025 HyperPredict. All rights reserved.</p>
+            <p id="datetime"></p>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top"><i class="fas fa-arrow-up"></i></a>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- GSAP, Scroll Reveal, and Monitor Scripts -->
+    <script>
+        // Scroll Reveal
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach((element) => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('active');
+                    gsap.to(element, { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' });
+                }
+            });
+        }
+
+        window.addEventListener('scroll', reveal);
+        reveal();
+
+        // Navbar Scroll Effect
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Back to Top Button
+        const backToTop = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => {
+            backToTop.classList.toggle('visible', window.scrollY > 300);
+        });
+
+        // BP Wave Animation
+        const bpCanvas = document.getElementById('bpCanvas');
+        const bpCtx = bpCanvas?.getContext('2d');
+        let bpAnimationFrameId;
+
+        function initBPCanvas() {
+            if (!bpCtx) return;
+            bpCanvas.width = bpCanvas.offsetWidth;
+            bpCanvas.height = bpCanvas.offsetHeight;
+
+            // Draw grid background
+            bpCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            bpCtx.lineWidth = 1;
+            for (let x = 0; x < bpCanvas.width; x += 20) {
+                bpCtx.beginPath();
+                bpCtx.moveTo(x, 0);
+                bpCtx.lineTo(x, bpCanvas.height);
+                bpCtx.stroke();
+            }
+            for (let y = 0; y < bpCanvas.height; y += 20) {
+                bpCtx.beginPath();
+                bpCtx.moveTo(0, y);
+                bpCtx.lineTo(bpCanvas.width, y);
+                bpCtx.stroke();
+            }
+        }
+
+        let bpTime = 0;
+        function drawBPWave() {
+            if (!bpCtx || !document.body.classList.contains('monitor-active')) {
+                bpAnimationFrameId = requestAnimationFrame(drawBPWave);
+                return;
+            }
+
+            bpCtx.clearRect(0, 0, bpCanvas.width, bpCanvas.height);
+            initBPCanvas();
+
+            bpCtx.strokeStyle = 'var(--monitor-color)';
+            bpCtx.lineWidth = 3;
+            bpCtx.beginPath();
+
+            const speed = 0.02;
+            const amplitude = 30 + Math.sin(bpTime * 0.1) * 10;
+            const frequency = 0.03;
+            const yCenter = bpCanvas.height / 2;
+
+            for (let x = 0; x < bpCanvas.width; x++) {
+                const y = yCenter + amplitude * Math.sin((x + bpTime) * frequency);
+                x === 0 ? bpCtx.moveTo(x, y) : bpCtx.lineTo(x, y);
+            }
+
+            bpCtx.stroke();
+            bpTime += speed * 60;
+            bpAnimationFrameId = requestAnimationFrame(drawBPWave);
+        }
+
+        // Heart Rate Wave Animation
+        const hrCanvas = document.getElementById('heartRateCanvas');
+        const hrCtx = hrCanvas?.getContext('2d');
+        let hrAnimationFrameId;
+
+        function initHRCanvas() {
+            if (!hrCtx) return;
+            hrCanvas.width = hrCanvas.offsetWidth;
+            hrCanvas.height = hrCanvas.offsetHeight;
+
+            // Draw grid background
+            hrCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            hrCtx.lineWidth = 1;
+            for (let x = 0; x < hrCanvas.width; x += 20) {
+                hrCtx.beginPath();
+                hrCtx.moveTo(x, 0);
+                hrCtx.lineTo(x, hrCanvas.height);
+                hrCtx.stroke();
+            }
+            for (let y = 0; y < hrCanvas.height; y += 20) {
+                hrCtx.beginPath();
+                hrCtx.moveTo(0, y);
+                hrCtx.lineTo(hrCanvas.width, y);
+                hrCtx.stroke();
+            }
+        }
+
+        let hrTime = 0;
+        let currentBPM = 72;
+        function drawHeartRateWave() {
+            if (!hrCtx || !document.body.classList.contains('monitor-active')) {
+                hrAnimationFrameId = requestAnimationFrame(drawHeartRateWave);
+                return;
+            }
+
+            hrCtx.clearRect(0, 0, hrCanvas.width, hrCanvas.height);
+            initHRCanvas();
+
+            hrCtx.strokeStyle = 'var(--monitor-color)';
+            hrCtx.lineWidth = 3;
+            hrCtx.beginPath();
+
+            const speed = 0.03;
+            const yCenter = hrCanvas.height / 2;
+            const beatInterval = 60 / currentBPM * 1000 / speed;
+            const peakHeight = 40;
+
+            for (let x = 0; x < hrCanvas.width; x++) {
+                const phase = ((x + hrTime) % beatInterval) / beatInterval;
+                let y = yCenter;
+                if (phase < 0.1) {
+                    y = yCenter - peakHeight * (1 - Math.cos(phase * 20 * Math.PI));
+                } else if (phase < 0.3) {
+                    y = yCenter + peakHeight * 0.2 * Math.sin((phase - 0.1) * 10 * Math.PI);
+                }
+                x === 0 ? hrCtx.moveTo(x, y) : hrCtx.lineTo(x, y);
+            }
+
+            hrCtx.stroke();
+            hrTime += speed * 60;
+            hrAnimationFrameId = requestAnimationFrame(drawHeartRateWave);
+        }
+
+        // Initialize Canvases
+        window.addEventListener('resize', () => {
+            initBPCanvas();
+            initHRCanvas();
+        });
+        initBPCanvas();
+        initHRCanvas();
+        drawBPWave();
+        drawHeartRateWave();
+
+        // Live BP and Heart Rate
+        function updateStats() {
+            if (!document.body.classList.contains('monitor-active')) return;
+
+            // Update BP
+            const bpValue = document.getElementById('bp-value');
+            const liveStats = document.querySelector('.live-stats');
+            if (bpValue && liveStats) {
+                const systolic = Math.floor(Math.random() * (140 - 100) + 100);
+                const diastolic = Math.floor(Math.random() * (90 - 60) + 60);
+                bpValue.textContent = `${systolic}/${diastolic}`;
+                gsap.to(bpValue, { scale: 1.1, duration: 0.2, ease: 'power1.in', yoyo: true, repeat: 1 });
+
+                // Status Indicator
+                if (systolic > 130 || diastolic > 85 || currentBPM > 90 || currentBPM < 60) {
+                    liveStats.classList.add('warning');
+                } else {
+                    liveStats.classList.remove('warning');
+                }
+            }
+
+            // Update Heart Rate and Animation Symbol
+            const hrValue = document.getElementById('hr-value');
+            const animationSymbol = document.getElementById('animationSymbol');
+            if (hrValue && animationSymbol) {
+                currentBPM = Math.floor(Math.random() * (100 - 60) + 60);
+                hrValue.textContent = currentBPM;
+                gsap.to(hrValue, { scale: 1.1, duration: 0.2, ease: 'power1.in', yoyo: true, repeat: 1 });
+
+                // Sync animation symbol
+                const beatDuration = 60 / currentBPM;
+                animationSymbol.style.animation = `symbolPulse ${beatDuration}s infinite`;
+            }
+        }
+        updateStats();
+        setInterval(updateStats, 2000);
+
+        // Live DateTime
+        function updateDateTime() {
+            const datetimeElement = document.getElementById('datetime');
+            if (datetimeElement) {
+                const now = new Date();
+                datetimeElement.textContent = now.toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' });
+            }
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Toggle Monitor Mode
+        function toggleMonitor() {
+            document.body.classList.toggle('monitor-active');
+            const toggleBtn = document.querySelector('.monitor-toggle');
+            toggleBtn.textContent = document.body.classList.contains('monitor-active') ? 'Disable Live Monitor' : 'Enable Live Monitor';
+            const elements = [
+                document.querySelector('.bp-wave'),
+                document.querySelector('.heart-rate-wave'),
+                document.querySelector('.pulse-indicator'),
+                document.querySelector('.animation-symbol'),
+                document.querySelector('.live-stats')
+            ];
+            elements.forEach(el => {
+                if (el) el.style.display = document.body.classList.contains('monitor-active') ? 'block' : 'none';
+            });
+            if (document.body.classList.contains('monitor-active')) {
+                initBPCanvas();
+                initHRCanvas();
+                drawBPWave();
+                drawHeartRateWave();
+                updateStats();
+            } else {
+                if (bpAnimationFrameId) cancelAnimationFrame(bpAnimationFrameId);
+                if (hrAnimationFrameId) cancelAnimationFrame(hrAnimationFrameId);
+            }
+        }
+
+        // Initial Monitor State
+        document.body.classList.add('monitor-active');
+    </script>
+</body>
+</html>

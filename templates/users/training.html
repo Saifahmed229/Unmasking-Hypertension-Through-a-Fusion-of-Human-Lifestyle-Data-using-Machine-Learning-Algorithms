@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hypertension Risk Model Training</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 30px;
+        }
+        .btn-train {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+        .card {
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .confusion-img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        pre {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="text-center mb-4">🩺 Hypertension Risk Model Trainer</h2>
+
+    <form method="POST" class="text-center mb-4">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-train btn-lg">🚀 Train Model</button>
+    </form>
+
+    {% if status %}
+    <div class="alert alert-success text-center fw-bold">
+        ✅ {{ status }}
+    </div>
+
+    {% for model, result in model_results.items %}
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">{{ model }}</h4>
+            <p class="card-text"><strong>Accuracy:</strong> {{ result.accuracy }}</p>
+
+            <h5 class="mt-4">Confusion Matrix</h5>
+            <img src="data:image/png;base64,{{ result.confusion_matrix }}" alt="{{ model }} Confusion Matrix" class="confusion-img">
+
+            <h5 class="mt-4">Classification Report</h5>
+            <pre>{{ result.classification_report }}</pre>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+</body>
+</html>

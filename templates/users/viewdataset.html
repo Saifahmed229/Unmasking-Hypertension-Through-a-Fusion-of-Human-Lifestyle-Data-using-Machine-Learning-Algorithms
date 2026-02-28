@@ -1,0 +1,16 @@
+<!-- templates/users/viewdataset.html -->
+{% extends 'users/userbase.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">View Dataset</h2>
+
+    {% if table %}
+        <div class="table-responsive">
+            {{ table|safe }}
+        </div>
+    {% else %}
+        <p>No data available.</p>
+    {% endif %}
+</div>
+{% endblock %}
